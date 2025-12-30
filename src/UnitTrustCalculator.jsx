@@ -410,11 +410,16 @@ const UnitTrustCalculator = () => {
                         </div>
                     </>
                 ) : (
-                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
+                        {/* Fixed Back Button in Bottom Right */}
+                        <button
+                            onClick={() => setPage('home')}
+                            className="fixed bottom-8 right-8 z-[100] bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(79,70,229,0.4)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 border border-white/20 whitespace-nowrap"
+                        >
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Back to Dashboard
+                        </button>
+
                         <div className="flex items-center gap-4">
-                            <button onClick={() => setPage('home')} className="text-xs font-black text-purple-400 uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors">
-                                &larr; Back to Dashboard
-                            </button>
                             <h2 className="text-xl font-black uppercase text-white tracking-widest">Multi-Year Simulation Console</h2>
                         </div>
 
