@@ -178,10 +178,10 @@ const FDIncomeCalculator = () => {
                 {/* Header */}
                 <div className="text-center md:text-left">
                     <div className="flex items-center gap-3 mb-2 justify-center md:justify-start">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-xl shadow-[0_0_20px_rgba(79,70,229,0.3)]">I</div>
-                        <h1 className="text-2xl font-bold tracking-tight">Income<span className="text-purple-400">Calculator</span></h1>
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.3)]">LT</div>
+                        <h1 className="text-2xl font-bold tracking-tight">LT <span className="text-purple-400">Income</span> Calculator</h1>
                     </div>
-                    <p className="text-gray-500 text-sm max-w-2xl">LKR income estimation after AIT Tax, Savings Interest, and Tithe deductions.</p>
+                    <p className="text-gray-500 text-sm max-w-2xl">LKR income estimation after AIT Tax, Savings Interest, and Tithe deductions by LT Finance.</p>
                 </div>
 
                 {/* Configuration Grid */}
@@ -413,7 +413,7 @@ const FDIncomeCalculator = () => {
                 </div>
 
                 <footer className="text-center py-8">
-                    <p className="text-gray-600 text-[10px] uppercase font-bold tracking-[0.3em]">© {new Date().getFullYear()} Fluido FD Infrastructure</p>
+                    <p className="text-gray-600 text-[10px] uppercase font-bold tracking-[0.3em]">© {new Date().getFullYear()} LT Finance Infrastructure</p>
                 </footer>
             </div>
         </div>

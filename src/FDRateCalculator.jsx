@@ -99,8 +99,8 @@ export default function FluidoFDRates() {
                 {/* Header / Top Bar */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-xl">F</div>
-                        <h1 className="text-2xl font-bold tracking-tight">FD Yield<span className="text-purple-400">Calculator</span></h1>
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-lg shadow-lg">LT</div>
+                        <h1 className="text-2xl font-bold tracking-tight">LT <span className="text-purple-400">Yield</span> Calculator</h1>
                     </div>
 
                     <div className="flex items-center gap-4 bg-[#0f1221] p-1.5 rounded-full border border-[#2a2e45]">
