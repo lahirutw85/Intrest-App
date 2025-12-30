@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import FluidoFDRates from './FDRateCalculator'
 import FDIncomeCalculator from './FDIncomeCalculator'
+import UnitTrustCalculator from './UnitTrustCalculator'
 
 function App() {
-  const [currentTab, setCurrentTab] = useState('yield') // 'yield' or 'income'
+  const [currentTab, setCurrentTab] = useState('yield') // 'yield', 'income', or 'unittrust'
 
   return (
     <div className="min-h-screen bg-[#050816]">
@@ -27,13 +28,21 @@ function App() {
             >
               Fixed Deposit Income Calculator
             </button>
+            <button
+              onClick={() => setCurrentTab('unittrust')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'unittrust' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              Unit Trust Investment
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
       <main>
-        {currentTab === 'yield' ? <FluidoFDRates /> : <FDIncomeCalculator />}
+        {currentTab === 'yield' && <FluidoFDRates />}
+        {currentTab === 'income' && <FDIncomeCalculator />}
+        {currentTab === 'unittrust' && <UnitTrustCalculator />}
       </main>
     </div>
   )
