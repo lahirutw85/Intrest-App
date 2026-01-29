@@ -179,24 +179,26 @@ const UnitTrustCalculator = () => {
         const monthlyFd = (parseNumber(fixedDepositAmount) * (parseFloat(fixedDepositRate) || 0) / 100) / 12;
         const yearlyFd = monthlyFd * 12;
 
-        const totalTaxable = annualWithdrawal + yearlyFd;
-        const { tax, breakdown } = calculateTax(totalTaxable);
-
         const yearlyOtherFunds = fundResults.filter(f => f.fund !== "Quantitative Equity").reduce((acc, r) => acc + r.yearly, 0);
-        const yearlyNet = (yearlyOtherFunds + annualWithdrawal + yearlyFd) - tax;
+
+        // Tax only applies to Fixed Deposit income as per user request
+        const totalTaxable = yearlyFd;
+        const { tax, breakdown } = calculateTax(totalTaxable);
+        const monthlyFdTax = tax / 12;
+
+        const totalMonthlyEst = fundResults.reduce((acc, r) => acc + r.monthly, 0);
+        const totalYearlyEst = fundResults.reduce((acc, r) => acc + r.yearly, 0);
 
         return {
             funds: fundResults,
             totalInvestment,
+            totalMonthlyEst,
+            totalYearlyEst,
             annualWithdrawal,
             monthlyLoan,
             monthlyVehicle,
             monthlyFd,
-            tax,
-            breakdown,
-            yearlyNet,
-            monthlyNet: yearlyNet / 12,
-            totalTaxable
+            monthlyFdTax
         };
     }, [rates, investments, withdrawalPercentage, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate]);
 
@@ -305,91 +307,25 @@ const UnitTrustCalculator = () => {
                             ))}
                         </div>
 
-                        {/* Loans & FD Section */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <GlowingCard className="space-y-6">
-                                <div className="flex items-center gap-2 text-purple-400 font-bold uppercase tracking-widest text-xs">
-                                    <Home className="w-4 h-4" /> Housing & Asset Finance
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <InputField label="House Price" value={housePrice} onChange={e => setHousePrice(e.target.value)} onBlur={() => setHousePrice(parseNumber(housePrice).toLocaleString())} />
-                                    <InputField label="Down Payment" value={downPayment} onChange={e => setDownPayment(e.target.value)} onBlur={() => setDownPayment(parseNumber(downPayment).toLocaleString())} />
-                                    <InputField label="Interest Rate %" value={loanInterestRate} onChange={e => setLoanInterestRate(e.target.value)} suffix="%" />
-                                    <InputField label="Term (Years)" value={loanTerm} onChange={e => setLoanTerm(e.target.value)} suffix="Y" />
-                                </div>
-                                <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl text-center">
-                                    <span className="text-[10px] text-orange-400 font-black uppercase">Monthly Installment</span>
-                                    <div className="text-xl font-black text-white">Rs. {formatMoney(results.monthlyLoan)}</div>
-                                </div>
-                            </GlowingCard>
-
-                            <GlowingCard className="space-y-6">
-                                <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-xs">
-                                    <Coins className="w-4 h-4" /> Fixed Deposit & Yield
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <InputField label="FD Amount" value={fixedDepositAmount} onChange={e => setFixedDepositAmount(e.target.value)} onBlur={() => setFixedDepositAmount(parseNumber(fixedDepositAmount).toLocaleString())} />
-                                    <InputField label="Annual Rate %" value={fixedDepositRate} onChange={e => setFixedDepositRate(e.target.value)} suffix="%" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-center">
-                                        <span className="text-[10px] text-blue-400 font-black uppercase">Monthly Income</span>
-                                        <div className="text-xl font-black text-white">Rs. {formatMoney(results.monthlyFd)}</div>
-                                    </div>
-                                    <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-center">
-                                        <span className="text-[10px] text-green-400 font-black uppercase">Net Surplus</span>
-                                        <div className="text-xl font-black text-white">Rs. {formatMoney(results.monthlyFd - results.monthlyLoan)}</div>
-                                    </div>
-                                </div>
-                            </GlowingCard>
-                        </div>
-
                         {/* Summary Section */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <GlowingCard className="lg:col-span-2">
                                 <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                    <ReceiptText className="w-5 h-5 text-purple-500" /> Portfolio Summary & Tax Breakdown
+                                    <ReceiptText className="w-5 h-5 text-purple-500" /> Unit Trust Portfolio Summary
                                 </h2>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-                                    <div className="text-center">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase">Invested</span>
-                                        <div className="text-lg font-black text-blue-400">{formatMoney(results.totalInvestment)}</div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                                    <div className="text-center p-6 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Invested</span>
+                                        <div className="text-2xl font-black text-blue-400">Rs. {formatMoney(results.totalInvestment)}</div>
                                     </div>
-                                    <div className="text-center">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase">Taxable</span>
-                                        <div className="text-lg font-black text-purple-400">{formatMoney(results.totalTaxableIncome)}</div>
+                                    <div className="text-center p-6 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Monthly Income</span>
+                                        <div className="text-2xl font-black text-purple-400">Rs. {formatMoney(results.totalMonthlyEst)}</div>
                                     </div>
-                                    <div className="text-center">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase">Annual Tax</span>
-                                        <div className="text-lg font-black text-red-500">{formatMoney(results.tax)}</div>
+                                    <div className="text-center p-6 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Yearly Income</span>
+                                        <div className="text-2xl font-black text-green-400">Rs. {formatMoney(results.totalYearlyEst)}</div>
                                     </div>
-                                    <div className="text-center">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase">Monthly Net</span>
-                                        <div className="text-lg font-black text-green-400">{formatMoney(results.monthlyNet)}</div>
-                                    </div>
-                                </div>
-                                <div className="bg-[#1a1f35] rounded-2xl overflow-hidden border border-[#2a2e45]">
-                                    <table className="w-full text-xs text-left">
-                                        <thead className="bg-[#0f1221] text-gray-400 uppercase font-black tracking-tighter">
-                                            <tr>
-                                                <th className="p-4">Bracket</th>
-                                                <th className="p-4 text-right">Rate</th>
-                                                <th className="p-4 text-right">Taxable</th>
-                                                <th className="p-4 text-right">Tax</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-[#2a2e45]">
-                                            {results.breakdown.map((b, i) => (
-                                                <tr key={i}>
-                                                    <td className="p-4 text-gray-300 font-bold">{b.range}</td>
-                                                    <td className="p-4 text-right font-bold">{(b.rate * 100)}%</td>
-                                                    <td className="p-4 text-right text-gray-400">{b.taxable.toLocaleString()}</td>
-                                                    <td className="p-4 text-right font-black text-red-400">{b.partTax.toLocaleString()}</td>
-                                                </tr>
-                                            ))}
-                                            {results.breakdown.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-gray-600 font-bold">No Income Tax Applicable</td></tr>}
-                                        </tbody>
-                                    </table>
                                 </div>
                             </GlowingCard>
 
@@ -406,6 +342,68 @@ const UnitTrustCalculator = () => {
                                 >
                                     OPEN SIMULATOR <ArrowRight className="w-4 h-4" />
                                 </button>
+                            </GlowingCard>
+                        </div>
+
+                        {/* Loans & FD Section */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <GlowingCard className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-purple-400 font-bold uppercase tracking-widest text-xs">
+                                        <Home className="w-4 h-4" /> Housing Finance
+                                    </div>
+                                    <div className="text-[10px] text-gray-500 font-bold">EMI: Rs. {formatMoney(results.monthlyLoan)}</div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <InputField label="House Price" value={housePrice} onChange={e => setHousePrice(e.target.value)} onFocus={() => setHousePrice(String(housePrice).replace(/,/g, ''))} onBlur={() => setHousePrice(parseNumber(housePrice).toLocaleString())} />
+                                    <InputField label="Down Payment" value={downPayment} onChange={e => setDownPayment(e.target.value)} onFocus={() => setDownPayment(String(downPayment).replace(/,/g, ''))} onBlur={() => setDownPayment(parseNumber(downPayment).toLocaleString())} />
+                                    <InputField label="Interest Rate %" value={loanInterestRate} onChange={e => setLoanInterestRate(e.target.value)} suffix="%" />
+                                    <InputField label="Term (Years)" value={loanTerm} onChange={e => setLoanTerm(e.target.value)} suffix="Y" />
+                                </div>
+
+                                <div className="border-t border-[#2a2e45] pt-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-xs">
+                                            <Car className="w-4 h-4" /> Vehicle Finance
+                                        </div>
+                                        <div className="text-[10px] text-gray-500 font-bold">EMI: Rs. {formatMoney(results.monthlyVehicle)}</div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <InputField label="Vehicle Price" value={vehiclePrice} onChange={e => setVehiclePrice(e.target.value)} onFocus={() => setVehiclePrice(String(vehiclePrice).replace(/,/g, ''))} onBlur={() => setVehiclePrice(parseNumber(vehiclePrice).toLocaleString())} />
+                                        <InputField label="Down Payment" value={vehicleDownPayment} onChange={e => setVehicleDownPayment(e.target.value)} onFocus={() => setVehicleDownPayment(String(vehicleDownPayment).replace(/,/g, ''))} onBlur={() => setVehicleDownPayment(parseNumber(vehicleDownPayment).toLocaleString())} />
+                                        <InputField label="Interest Rate %" value={vehicleLoanInterestRate} onChange={e => setVehicleLoanInterestRate(e.target.value)} suffix="%" />
+                                        <InputField label="Term (Years)" value={vehicleLoanTerm} onChange={e => setVehicleLoanTerm(e.target.value)} suffix="Y" />
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-2xl text-center">
+                                    <span className="text-[10px] text-orange-400 font-black uppercase">Total Monthly Installments</span>
+                                    <div className="text-xl font-black text-white">Rs. {formatMoney(results.monthlyLoan + results.monthlyVehicle)}</div>
+                                </div>
+                            </GlowingCard>
+
+                            <GlowingCard className="space-y-6">
+                                <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-xs">
+                                    <Coins className="w-4 h-4" /> Fixed Deposit & Yield
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <InputField label="FD Amount" value={fixedDepositAmount} onChange={e => setFixedDepositAmount(e.target.value)} onBlur={() => setFixedDepositAmount(parseNumber(fixedDepositAmount).toLocaleString())} />
+                                    <InputField label="Annual Rate %" value={fixedDepositRate} onChange={e => setFixedDepositRate(e.target.value)} suffix="%" />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-center">
+                                        <span className="text-[10px] text-blue-400 font-black uppercase">Monthly Income</span>
+                                        <div className="text-xl font-black text-white">Rs. {formatMoney(results.monthlyFd)}</div>
+                                    </div>
+                                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-center">
+                                        <span className="text-[10px] text-red-400 font-black uppercase">Monthly Tax</span>
+                                        <div className="text-xl font-black text-white text-red-400">Rs. {formatMoney(results.monthlyFdTax)}</div>
+                                    </div>
+                                    <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-center">
+                                        <span className="text-[10px] text-green-400 font-black uppercase">Net Surplus</span>
+                                        <div className="text-xl font-black text-white">Rs. {formatMoney(results.monthlyFd - results.monthlyFdTax - results.monthlyLoan - results.monthlyVehicle)}</div>
+                                    </div>
+                                </div>
                             </GlowingCard>
                         </div>
                     </>
