@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Info, Calculator, RefreshCw, Landmark, Wallet, ReceiptText, TrendingUp, AlertCircle } from 'lucide-react';
+import { Info, Calculator, RefreshCw, Landmark, Wallet, ReceiptText, TrendingUp, AlertCircle, Cloud, CloudOff } from 'lucide-react';
 
 // --- SHARED UI COMPONENTS (Matching Yield Calculator) ---
 
@@ -60,6 +60,9 @@ const FDIncomeCalculator = () => {
     const [exchangeRateStatus, setExchangeRateStatus] = useState('');
     const [isCalculated, setIsCalculated] = useState(false);
     const [tableData, setTableData] = useState([]);
+    const [syncStatus, setSyncStatus] = useState('idle');
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywACifEYGRp8qy7BiQ_ojnpUyPgCRKU6nT_yHkI0NwIv5iAzf6GP0b8d-LHyqvMOVh/exec";
 
     // --- API Interaction ---
     useEffect(() => {
@@ -131,6 +134,43 @@ const FDIncomeCalculator = () => {
         }
         setTableData(newTableData);
         setIsCalculated(true);
+    };
+
+    const handleSyncToSheets = async () => {
+        setSyncStatus('syncing');
+        try {
+            const payload = {
+                calculatorType: "FD Income Projection",
+                inputs: {
+                    bank1,
+                    bank2,
+                    exchangeRate,
+                    savingsInterestRate,
+                    monthlyExpenses,
+                    taxExemption
+                },
+                results: {
+                    bank1Net: bank1Details.netMonthlyIncome,
+                    bank2Net: bank2Details.netMonthlyIncome,
+                    annualSavings: annualTaxSummary?.finalSavings || 0
+                }
+            };
+
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            setSyncStatus('success');
+            setTimeout(() => setSyncStatus('idle'), 3000);
+        } catch (error) {
+            console.error('Sync error:', error);
+            setSyncStatus('error');
+            setTimeout(() => setSyncStatus('idle'), 3000);
+        }
     };
 
     const handleExpenseChange = (index, value) => {
@@ -284,6 +324,24 @@ const FDIncomeCalculator = () => {
                         className="flex-1 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                     >
                         <Calculator className="w-5 h-5" /> ගණනය කරන්න
+                    </button>
+                    <button
+                        onClick={handleSyncToSheets}
+                        disabled={syncStatus === 'syncing'}
+                        className={`
+                            px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 group border
+                            ${syncStatus === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                                syncStatus === 'error' ? 'bg-red-500/10 border-red-500/30 text-red-500' :
+                                    'bg-[#1a1f35] border-[#2a2e45] text-gray-400 hover:text-white hover:bg-[#252a40]'}
+                        `}
+                    >
+                        {syncStatus === 'syncing' ? <Cloud className="w-5 h-5 animate-pulse" /> :
+                            syncStatus === 'success' ? <Cloud className="w-5 h-5" /> :
+                                syncStatus === 'error' ? <CloudOff className="w-5 h-5" /> :
+                                    <Cloud className="w-5 h-5" />}
+                        {syncStatus === 'syncing' ? 'Saving...' :
+                            syncStatus === 'success' ? 'Saved' :
+                                syncStatus === 'error' ? 'Error' : 'Sync Cloud'}
                     </button>
                     <button
                         onClick={handleReset}

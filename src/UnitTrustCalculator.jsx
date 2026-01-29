@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     Info, Calculator, RefreshCw, TrendingUp, AlertCircle,
-    Landmark, Wallet, ReceiptText, Home, Car, Coins, ArrowRight
+    Landmark, Wallet, ReceiptText, Home, Car, Coins, ArrowRight, Cloud, CloudOff
 } from 'lucide-react';
 
 // --- SHARED UI COMPONENTS (Consistent with other calculators) ---
@@ -113,6 +113,9 @@ const UnitTrustCalculator = () => {
     const [projectionResults, setProjectionResults] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateMessage, setUpdateMessage] = useState("");
+    const [syncStatus, setSyncStatus] = useState('idle'); // 'idle', 'syncing', 'success', 'error'
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywACifEYGRp8qy7BiQ_ojnpUyPgCRKU6nT_yHkI0NwIv5iAzf6GP0b8d-LHyqvMOVh/exec";
 
     // --- Calculation Logic ---
     const calculateReturns = (capital, annualRate, withdrawalPerc) => {
@@ -203,6 +206,53 @@ const UnitTrustCalculator = () => {
     }, [rates, investments, withdrawalPercentage, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate]);
 
     // --- Actions ---
+    const handleSyncToSheets = async () => {
+        setSyncStatus('syncing');
+        try {
+            const payload = {
+                calculatorType: "Unit Trust Portfolio",
+                inputs: {
+                    rates,
+                    investments,
+                    withdrawalPercentage,
+                    housePrice,
+                    downPayment,
+                    loanInterestRate,
+                    loanTerm,
+                    vehiclePrice,
+                    vehicleDownPayment,
+                    vehicleLoanInterestRate,
+                    vehicleLoanTerm,
+                    fixedDepositAmount,
+                    fixedDepositRate
+                },
+                results: {
+                    totalInvestment: results.totalInvestment,
+                    totalMonthlyEst: results.totalMonthlyEst,
+                    totalYearlyEst: results.totalYearlyEst,
+                    monthlyLoan: results.monthlyLoan,
+                    monthlyVehicle: results.monthlyVehicle,
+                    monthlyFd: results.monthlyFd
+                }
+            };
+
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            setSyncStatus('success');
+            setTimeout(() => setSyncStatus('idle'), 3000);
+        } catch (error) {
+            console.error('Sync error:', error);
+            setSyncStatus('error');
+            setTimeout(() => setSyncStatus('idle'), 3000);
+        }
+    };
+
     const handleUpdateRates = async () => {
         setIsUpdating(true);
         setUpdateMessage("Fetching latest rates...");
@@ -264,6 +314,24 @@ const UnitTrustCalculator = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={handleSyncToSheets}
+                            disabled={syncStatus === 'syncing'}
+                            className={`
+                                px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 group border
+                                ${syncStatus === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                                    syncStatus === 'error' ? 'bg-red-500/10 border-red-500/30 text-red-500' :
+                                        'bg-[#0f1221] border-[#2a2e45] text-gray-400 hover:text-white hover:bg-[#1a1f35]'}
+                            `}
+                        >
+                            {syncStatus === 'syncing' ? <Cloud className="w-3 h-3 animate-pulse" /> :
+                                syncStatus === 'success' ? <Cloud className="w-3 h-3" /> :
+                                    syncStatus === 'error' ? <CloudOff className="w-3 h-3" /> :
+                                        <Cloud className="w-3 h-3" />}
+                            {syncStatus === 'syncing' ? 'Syncing...' :
+                                syncStatus === 'success' ? 'Data Saved' :
+                                    syncStatus === 'error' ? 'Sync Failed' : 'Sync to Cloud'}
+                        </button>
                         <button
                             onClick={handleUpdateRates}
                             disabled={isUpdating}

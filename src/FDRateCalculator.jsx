@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowRight, Info, Zap } from 'lucide-react';
+import { ArrowRight, Info, Zap, Cloud, CloudOff } from 'lucide-react';
 
 // --- UPDATED DATA SOURCE (Softlogic + Previous Data) ---
 const BANK_RATES = {
@@ -78,6 +78,9 @@ const StatRow = ({ label, value, highlight = false }) => (
 export default function FluidoFDRates() {
     const [amount, setAmount] = useState(1000000);
     const [mode, setMode] = useState("maturity"); // 'maturity' or 'monthly'
+    const [syncStatus, setSyncStatus] = useState('idle');
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywACifEYGRp8qy7BiQ_ojnpUyPgCRKU6nT_yHkI0NwIv5iAzf6GP0b8d-LHyqvMOVh/exec";
 
     const formatCurrency = (val) =>
         new Intl.NumberFormat('en-LK', { style: 'currency', currency: 'LKR', maximumFractionDigits: 0 }).format(val);
@@ -91,6 +94,35 @@ export default function FluidoFDRates() {
             return { ...bank, returnVal: interest };
         }).sort((a, b) => b.returnVal - a.returnVal);
     }, [amount, mode]);
+
+    const handleSyncToSheets = async () => {
+        setSyncStatus('syncing');
+        try {
+            const payload = {
+                calculatorType: "Yield Comparison",
+                inputs: {
+                    amount,
+                    mode
+                },
+                results: results.slice(0, 5).map(b => ({ name: b.name, rate: b.rate, returns: b.returnVal }))
+            };
+
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            setSyncStatus('success');
+            setTimeout(() => setSyncStatus('idle'), 3000);
+        } catch (error) {
+            console.error('Sync error:', error);
+            setSyncStatus('error');
+            setTimeout(() => setSyncStatus('idle'), 3000);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#050816] text-white font-sans p-4 md:p-8 selection:bg-purple-500/30">
@@ -139,19 +171,40 @@ export default function FluidoFDRates() {
                         </div>
                     </div>
 
-                    <div className="bg-[#0f1221] p-2 rounded-2xl border border-[#2a2e45] inline-flex gap-2">
-                        <GradientButton
-                            active={mode === 'maturity'}
-                            onClick={() => setMode('maturity')}
+                    <div className="flex bg-[#0f1221] p-1.5 rounded-2xl border border-[#2a2e45] gap-2 items-center">
+                        <div className="inline-flex gap-2">
+                            <GradientButton
+                                active={mode === 'maturity'}
+                                onClick={() => setMode('maturity')}
+                            >
+                                Yearly (At Maturity)
+                            </GradientButton>
+                            <GradientButton
+                                active={mode === 'monthly'}
+                                onClick={() => setMode('monthly')}
+                            >
+                                Monthly Income
+                            </GradientButton>
+                        </div>
+                        <div className="h-8 w-px bg-[#2a2e45] mx-2 hidden sm:block"></div>
+                        <button
+                            onClick={handleSyncToSheets}
+                            disabled={syncStatus === 'syncing'}
+                            className={`
+                                px-4 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 group border
+                                ${syncStatus === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
+                                    syncStatus === 'error' ? 'bg-red-500/10 border-red-500/30 text-red-500' :
+                                        'bg-[#1a1f35] border-[#2a2e45] text-gray-400 hover:text-white hover:bg-[#252a40]'}
+                            `}
                         >
-                            Yearly (At Maturity)
-                        </GradientButton>
-                        <GradientButton
-                            active={mode === 'monthly'}
-                            onClick={() => setMode('monthly')}
-                        >
-                            Monthly Income
-                        </GradientButton>
+                            {syncStatus === 'syncing' ? <Cloud className="w-3.5 h-3.5 animate-pulse" /> :
+                                syncStatus === 'success' ? <Cloud className="w-3.5 h-3.5" /> :
+                                    syncStatus === 'error' ? <CloudOff className="w-3.5 h-3.5" /> :
+                                        <Cloud className="w-3.5 h-3.5" />}
+                            {syncStatus === 'syncing' ? 'Saving...' :
+                                syncStatus === 'success' ? 'Saved' :
+                                    syncStatus === 'error' ? 'Error' : 'Sync Cloud'}
+                        </button>
                     </div>
                 </div>
 
