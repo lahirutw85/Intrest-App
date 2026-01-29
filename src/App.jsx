@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import FluidoFDRates from './FDRateCalculator'
-import FDIncomeCalculator from './FDIncomeCalculator'
 import UnitTrustCalculator from './UnitTrustCalculator'
 
 function App() {
-  const [currentTab, setCurrentTab] = useState('yield') // 'yield', 'income', or 'unittrust'
+  const [currentTab, setCurrentTab] = useState('unittrust') // 'unittrust' or 'yield'
 
   return (
     <div className="min-h-screen bg-[#050816]">
@@ -17,22 +16,16 @@ function App() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => setCurrentTab('yield')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'yield' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-            >
-              Yield Calculator
-            </button>
-            <button
-              onClick={() => setCurrentTab('income')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'income' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
-            >
-              Fixed Deposit Income Calculator
-            </button>
-            <button
               onClick={() => setCurrentTab('unittrust')}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'unittrust' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               Unit Trust Investment
+            </button>
+            <button
+              onClick={() => setCurrentTab('yield')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'yield' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              Yield Calculator
             </button>
           </div>
         </div>
@@ -40,9 +33,8 @@ function App() {
 
       {/* Main Content */}
       <main>
-        {currentTab === 'yield' && <FluidoFDRates />}
-        {currentTab === 'income' && <FDIncomeCalculator />}
         {currentTab === 'unittrust' && <UnitTrustCalculator />}
+        {currentTab === 'yield' && <FluidoFDRates />}
       </main>
     </div>
   )
