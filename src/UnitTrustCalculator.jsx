@@ -113,9 +113,48 @@ const UnitTrustCalculator = () => {
     const [projectionResults, setProjectionResults] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateMessage, setUpdateMessage] = useState("");
-    const [syncStatus, setSyncStatus] = useState('idle'); // 'idle', 'syncing', 'success', 'error'
+    const [syncStatus, setSyncStatus] = useState('idle'); // 'idle', 'syncing', 'loading', 'success', 'error'
 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywACifEYGRp8qy7BiQ_ojnpUyPgCRKU6nT_yHkI0NwIv5iAzf6GP0b8d-LHyqvMOVh/exec";
+
+    // --- Persistence Logic ---
+
+    // 1. Initial Load (Local Storage -> then Cloud)
+    useEffect(() => {
+        // First, check local storage for instant results
+        const localData = localStorage.getItem('unit_trust_data');
+        if (localData) {
+            try {
+                const parsed = JSON.parse(localData);
+                if (parsed.investments) setInvestments(parsed.investments);
+                if (parsed.housePrice) setHousePrice(parsed.housePrice);
+                // ... load other basic fields
+                if (parsed.withdrawalPercentage) setWithdrawalPercentage(parsed.withdrawalPercentage);
+            } catch (e) { console.error("Local load error", e); }
+        }
+
+        // Then, try to fetch the absolute latest from Cloud
+        handleLoadFromCloud();
+    }, []);
+
+    // 2. Auto-save to Local Storage on every change
+    useEffect(() => {
+        const dataToSave = {
+            investments,
+            housePrice,
+            downPayment,
+            loanInterestRate,
+            loanTerm,
+            vehiclePrice,
+            vehicleDownPayment,
+            vehicleLoanInterestRate,
+            vehicleLoanTerm,
+            fixedDepositAmount,
+            fixedDepositRate,
+            withdrawalPercentage
+        };
+        localStorage.setItem('unit_trust_data', JSON.stringify(dataToSave));
+    }, [investments, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate, withdrawalPercentage]);
 
     // --- Calculation Logic ---
     const calculateReturns = (capital, annualRate, withdrawalPerc) => {
@@ -253,6 +292,40 @@ const UnitTrustCalculator = () => {
         }
     };
 
+    const handleLoadFromCloud = async () => {
+        setSyncStatus('loading');
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const allData = await response.json();
+            const myData = allData["Unit Trust Portfolio"];
+
+            if (myData && myData.inputs) {
+                const inputs = myData.inputs;
+                if (inputs.rates) setRates(inputs.rates);
+                if (inputs.investments) setInvestments(inputs.investments);
+                if (inputs.withdrawalPercentage) setWithdrawalPercentage(inputs.withdrawalPercentage);
+                if (inputs.housePrice) setHousePrice(inputs.housePrice);
+                if (inputs.downPayment) setDownPayment(inputs.downPayment);
+                if (inputs.loanInterestRate) setLoanInterestRate(inputs.loanInterestRate);
+                if (inputs.loanTerm) setLoanTerm(inputs.loanTerm);
+                if (inputs.vehiclePrice) setVehiclePrice(inputs.vehiclePrice);
+                if (inputs.vehicleDownPayment) setVehicleDownPayment(inputs.vehicleDownPayment);
+                if (inputs.vehicleLoanInterestRate) setVehicleLoanInterestRate(inputs.vehicleLoanInterestRate);
+                if (inputs.vehicleLoanTerm) setVehicleLoanTerm(inputs.vehicleLoanTerm);
+                if (inputs.fixedDepositAmount) setFixedDepositAmount(inputs.fixedDepositAmount);
+                if (inputs.fixedDepositRate) setFixedDepositRate(inputs.fixedDepositRate);
+
+                setSyncStatus('success');
+                setTimeout(() => setSyncStatus('idle'), 2000);
+            } else {
+                setSyncStatus('idle');
+            }
+        } catch (error) {
+            console.error('Pick up error:', error);
+            setSyncStatus('idle');
+        }
+    };
+
     const handleUpdateRates = async () => {
         setIsUpdating(true);
         setUpdateMessage("Fetching latest rates...");
@@ -316,7 +389,7 @@ const UnitTrustCalculator = () => {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={handleSyncToSheets}
-                            disabled={syncStatus === 'syncing'}
+                            disabled={syncStatus === 'syncing' || syncStatus === 'loading'}
                             className={`
                                 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 group border
                                 ${syncStatus === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' :
@@ -325,20 +398,22 @@ const UnitTrustCalculator = () => {
                             `}
                         >
                             {syncStatus === 'syncing' ? <Cloud className="w-3 h-3 animate-pulse" /> :
-                                syncStatus === 'success' ? <Cloud className="w-3 h-3" /> :
-                                    syncStatus === 'error' ? <CloudOff className="w-3 h-3" /> :
-                                        <Cloud className="w-3 h-3" />}
+                                syncStatus === 'loading' ? <Cloud className="w-3 h-3 animate-bounce" /> :
+                                    syncStatus === 'success' ? <Cloud className="w-3 h-3" /> :
+                                        syncStatus === 'error' ? <CloudOff className="w-3 h-3" /> :
+                                            <Cloud className="w-3 h-3" />}
                             {syncStatus === 'syncing' ? 'Syncing...' :
-                                syncStatus === 'success' ? 'Data Saved' :
-                                    syncStatus === 'error' ? 'Sync Failed' : 'Sync to Cloud'}
+                                syncStatus === 'loading' ? 'Cloud Search...' :
+                                    syncStatus === 'success' ? 'Data Saved' :
+                                        syncStatus === 'error' ? 'Sync Failed' : 'Sync to Cloud'}
                         </button>
                         <button
-                            onClick={handleUpdateRates}
-                            disabled={isUpdating}
-                            className="bg-[#0f1221] border border-[#2a2e45] px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#1a1f35] transition-all flex items-center gap-2 group"
+                            onClick={handleLoadFromCloud}
+                            disabled={syncStatus === 'loading' || syncStatus === 'syncing'}
+                            className="bg-[#0f1221] border border-[#2a2e45] px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#1a1f35] transition-all flex items-center gap-2 group text-gray-400 hover:text-white"
                         >
-                            <RefreshCw className={`w-3 h-3 ${isUpdating ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-                            {isUpdating ? 'Syncing...' : 'Sync Live Rates'}
+                            <RefreshCw className={`w-3 h-3 ${syncStatus === 'loading' ? 'animate-spin' : ''}`} />
+                            {syncStatus === 'loading' ? 'Loading...' : 'Refresh From Cloud'}
                         </button>
                     </div>
                 </div>
