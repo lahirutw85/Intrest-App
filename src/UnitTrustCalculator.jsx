@@ -127,9 +127,17 @@ const UnitTrustCalculator = () => {
             try {
                 const parsed = JSON.parse(localData);
                 if (parsed.investments) setInvestments(parsed.investments);
-                if (parsed.housePrice) setHousePrice(parsed.housePrice);
-                // ... load other basic fields
                 if (parsed.withdrawalPercentage) setWithdrawalPercentage(parsed.withdrawalPercentage);
+                if (parsed.housePrice) setHousePrice(parsed.housePrice);
+                if (parsed.downPayment) setDownPayment(parsed.downPayment);
+                if (parsed.loanInterestRate) setLoanInterestRate(parsed.loanInterestRate);
+                if (parsed.loanTerm) setLoanTerm(parsed.loanTerm);
+                if (parsed.vehiclePrice) setVehiclePrice(parsed.vehiclePrice);
+                if (parsed.vehicleDownPayment) setVehicleDownPayment(parsed.vehicleDownPayment);
+                if (parsed.vehicleLoanInterestRate) setVehicleLoanInterestRate(parsed.vehicleLoanInterestRate);
+                if (parsed.vehicleLoanTerm) setVehicleLoanTerm(parsed.vehicleLoanTerm);
+                if (parsed.fixedDepositAmount) setFixedDepositAmount(parsed.fixedDepositAmount);
+                if (parsed.fixedDepositRate) setFixedDepositRate(parsed.fixedDepositRate);
             } catch (e) { console.error("Local load error", e); }
         }
 
