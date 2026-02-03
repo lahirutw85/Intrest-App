@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react' // Re-bundle trigger
 import FluidoFDRates from './FDRateCalculator'
 import UnitTrustCalculator from './UnitTrustCalculator'
+import NDBWealthCalculator from './NDBWealthCalculator.jsx'
 
 function App() {
-  const [currentTab, setCurrentTab] = useState('unittrust') // 'unittrust' or 'yield'
+  const [currentTab, setCurrentTab] = useState('unittrust') // 'unittrust', 'ndbwealth', or 'yield'
 
   return (
     <div className="min-h-screen bg-[#050816]">
@@ -22,6 +23,12 @@ function App() {
               Unit Trust Investment
             </button>
             <button
+              onClick={() => setCurrentTab('ndbwealth')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'ndbwealth' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              NDB Wealth Funds
+            </button>
+            <button
               onClick={() => setCurrentTab('yield')}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'yield' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
@@ -34,6 +41,7 @@ function App() {
       {/* Main Content */}
       <main>
         {currentTab === 'unittrust' && <UnitTrustCalculator />}
+        {currentTab === 'ndbwealth' && <NDBWealthCalculator />}
         {currentTab === 'yield' && <FluidoFDRates />}
       </main>
     </div>

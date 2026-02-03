@@ -81,10 +81,10 @@ const UnitTrustCalculator = () => {
     };
 
     const initialInvestments = {
-        "Investment Grade Fund": "10,000,000",
-        "Fixed Income Opportunities": "20,000,000",
-        "Quantitative Equity": "20,000,000",
-        "Money Market Fund": "5,000,000",
+        "Investment Grade Fund": "30,000,000",
+        "Fixed Income Opportunities": "30,000,000",
+        "Quantitative Equity": "30,000,000",
+        "Money Market Fund": "30,000,000",
     };
 
     const [rates, setRates] = useState(initialRates);
@@ -92,18 +92,18 @@ const UnitTrustCalculator = () => {
     const [withdrawalPercentage, setWithdrawalPercentage] = useState('0');
 
     // Loan State
-    const [housePrice, setHousePrice] = useState('20,000,000');
-    const [downPayment, setDownPayment] = useState('4,000,000');
+    const [housePrice, setHousePrice] = useState('30,000,000');
+    const [downPayment, setDownPayment] = useState('20,000,000');
     const [loanInterestRate, setLoanInterestRate] = useState('12.5');
     const [loanTerm, setLoanTerm] = useState('20');
 
-    const [vehiclePrice, setVehiclePrice] = useState('8,000,000');
-    const [vehicleDownPayment, setVehicleDownPayment] = useState('2,000,000');
+    const [vehiclePrice, setVehiclePrice] = useState('25,000,000');
+    const [vehicleDownPayment, setVehicleDownPayment] = useState('10,000,000');
     const [vehicleLoanInterestRate, setVehicleLoanInterestRate] = useState('14.5');
-    const [vehicleLoanTerm, setVehicleLoanTerm] = useState('7');
+    const [vehicleLoanTerm, setVehicleLoanTerm] = useState('5');
 
-    const [fixedDepositAmount, setFixedDepositAmount] = useState('20,000,000');
-    const [fixedDepositRate, setFixedDepositRate] = useState('10');
+    const [fixedDepositAmount, setFixedDepositAmount] = useState('150,000,000');
+    const [fixedDepositRate, setFixedDepositRate] = useState('12.5');
 
     // Projection State
     const [projectionInputs, setProjectionInputs] = useState({
@@ -122,7 +122,7 @@ const UnitTrustCalculator = () => {
     // 1. Initial Load (Local Storage -> then Cloud)
     useEffect(() => {
         // First, check local storage for instant results
-        const localData = localStorage.getItem('unit_trust_data');
+        const localData = localStorage.getItem('unit_trust_data_v2');
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
@@ -161,7 +161,7 @@ const UnitTrustCalculator = () => {
             fixedDepositRate,
             withdrawalPercentage
         };
-        localStorage.setItem('unit_trust_data', JSON.stringify(dataToSave));
+        localStorage.setItem('unit_trust_data_v2', JSON.stringify(dataToSave));
     }, [investments, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate, withdrawalPercentage]);
 
     // --- Calculation Logic ---
