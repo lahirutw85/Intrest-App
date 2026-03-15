@@ -3,6 +3,7 @@ import {
     Info, Calculator, RefreshCw, TrendingUp, AlertCircle,
     Landmark, Wallet, ReceiptText, Home, Car, Coins, ArrowRight, Cloud, CloudOff
 } from 'lucide-react';
+import { FUNDS_DATA } from './fundsData';
 
 // --- SHARED UI COMPONENTS (Consistent with other calculators) ---
 
@@ -72,12 +73,19 @@ const parseNumber = (s) => {
 const UnitTrustCalculator = () => {
     const [page, setPage] = useState('home'); // 'home' or 'projection'
 
+    // Helper to find fund rate from imported excel data
+    const getFundRate = (fundName) => {
+        const allFunds = [...FUNDS_DATA.stable, ...FUNDS_DATA.growth, ...FUNDS_DATA.shariah];
+        const fund = allFunds.find(f => f.name.toLowerCase().includes(fundName.toLowerCase()));
+        return fund ? (fund.rate / 100) : 0.08; // Default to 8% if exact name not found
+    };
+
     // Initial State Setup
     const initialRates = {
-        "Investment Grade Fund": 0.0886,
-        "Fixed Income Opportunities": 0.09,
-        "Quantitative Equity": 0.742,
-        "Money Market Fund": 0.085,
+        "Investment Grade Fund": getFundRate("Investment Grade Fund"),
+        "Fixed Income Opportunities": getFundRate("Fixed Income Opportunities"),
+        "Quantitative Equity": getFundRate("Quant"), // "CAL Quant Equity Fund" in excel
+        "Money Market Fund": getFundRate("Money Market"), // generic money market average or specific if you want
     };
 
     const initialInvestments = {
