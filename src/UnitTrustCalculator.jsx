@@ -220,8 +220,11 @@ const UnitTrustCalculator = () => {
             };
         });
 
-        const totalInvestment = fundResults.reduce((acc, r) => acc + r.capital, 0);
-        const annualWithdrawal = fundResults.find(f => f.fund === "Quantitative Equity")?.withdrawalAmount || 0;
+        const regularFunds = fundResults.filter(f => f.fund !== "Quantitative Equity");
+        const quantEquityFund = fundResults.find(f => f.fund === "Quantitative Equity");
+
+        const totalInvestment = regularFunds.reduce((acc, r) => acc + r.capital, 0);
+        const annualWithdrawal = quantEquityFund?.withdrawalAmount || 0;
 
         const monthlyLoan = calculateLoanPayment(parseNumber(housePrice), parseNumber(downPayment), parseFloat(loanInterestRate) || 0, parseInt(loanTerm) || 0);
         const monthlyVehicle = calculateLoanPayment(parseNumber(vehiclePrice), parseNumber(vehicleDownPayment), parseFloat(vehicleLoanInterestRate) || 0, parseInt(vehicleLoanTerm) || 0);
@@ -229,21 +232,28 @@ const UnitTrustCalculator = () => {
         const monthlyFd = (parseNumber(fixedDepositAmount) * (parseFloat(fixedDepositRate) || 0) / 100) / 12;
         const yearlyFd = monthlyFd * 12;
 
-        const yearlyOtherFunds = fundResults.filter(f => f.fund !== "Quantitative Equity").reduce((acc, r) => acc + r.yearly, 0);
+        const yearlyOtherFunds = regularFunds.reduce((acc, r) => acc + r.yearly, 0);
 
         // Tax only applies to Fixed Deposit income as per user request
         const totalTaxable = yearlyFd;
         const { tax, breakdown } = calculateTax(totalTaxable);
         const monthlyFdTax = tax / 12;
 
-        const totalMonthlyEst = fundResults.reduce((acc, r) => acc + r.monthly, 0);
-        const totalYearlyEst = fundResults.reduce((acc, r) => acc + r.yearly, 0);
+        const totalMonthlyEst = regularFunds.reduce((acc, r) => acc + r.monthly, 0);
+        const totalYearlyEst = regularFunds.reduce((acc, r) => acc + r.yearly, 0);
+
+        const quantInvestment = quantEquityFund ? quantEquityFund.capital : 0;
+        const quantMonthlyEst = quantEquityFund ? quantEquityFund.monthly : 0;
+        const quantYearlyEst = quantEquityFund ? quantEquityFund.yearly : 0;
 
         return {
             funds: fundResults,
             totalInvestment,
             totalMonthlyEst,
             totalYearlyEst,
+            quantInvestment,
+            quantMonthlyEst,
+            quantYearlyEst,
             annualWithdrawal,
             monthlyLoan,
             monthlyVehicle,
@@ -460,22 +470,44 @@ const UnitTrustCalculator = () => {
 
                         {/* Summary Section */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <GlowingCard className="lg:col-span-2">
-                                <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                    <ReceiptText className="w-5 h-5 text-purple-500" /> Unit Trust Portfolio Summary
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                                    <div className="text-center p-6 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Invested</span>
-                                        <div className="text-2xl font-black text-blue-400">Rs. {formatMoney(results.totalInvestment)}</div>
+                            <GlowingCard className="lg:col-span-2 space-y-6">
+                                <div>
+                                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                        <ReceiptText className="w-5 h-5 text-purple-500" /> Unit Trust Portfolio Summary (Excl. Quantitative)
+                                    </h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                        <div className="text-center p-4 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                            <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Invested</span>
+                                            <div className="text-xl font-black text-blue-400">Rs. {formatMoney(results.totalInvestment)}</div>
+                                        </div>
+                                        <div className="text-center p-4 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                            <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Monthly Income</span>
+                                            <div className="text-xl font-black text-purple-400">Rs. {formatMoney(results.totalMonthlyEst)}</div>
+                                        </div>
+                                        <div className="text-center p-4 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                            <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Yearly Income</span>
+                                            <div className="text-xl font-black text-green-400">Rs. {formatMoney(results.totalYearlyEst)}</div>
+                                        </div>
                                     </div>
-                                    <div className="text-center p-6 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Monthly Income</span>
-                                        <div className="text-2xl font-black text-purple-400">Rs. {formatMoney(results.totalMonthlyEst)}</div>
-                                    </div>
-                                    <div className="text-center p-6 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Yearly Income</span>
-                                        <div className="text-2xl font-black text-green-400">Rs. {formatMoney(results.totalYearlyEst)}</div>
+                                </div>
+
+                                <div className="border-t border-[#2a2e45] pt-6">
+                                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+                                        <TrendingUp className="w-5 h-5 text-cyan-500" /> Quantitative Equity Summary
+                                    </h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                        <div className="text-center p-4 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                            <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Total Invested</span>
+                                            <div className="text-xl font-black text-blue-400">Rs. {formatMoney(results.quantInvestment)}</div>
+                                        </div>
+                                        <div className="text-center p-4 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                            <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Monthly Est</span>
+                                            <div className="text-xl font-black text-cyan-400">Rs. {formatMoney(results.quantMonthlyEst)}</div>
+                                        </div>
+                                        <div className="text-center p-4 bg-[#1a1f35] rounded-2xl border border-[#2a2e45]">
+                                            <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-2 block">Yearly Est</span>
+                                            <div className="text-xl font-black text-cyan-400">Rs. {formatMoney(results.quantYearlyEst)}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </GlowingCard>
