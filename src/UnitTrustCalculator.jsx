@@ -126,6 +126,7 @@ const UnitTrustCalculator = () => {
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
+                if (parsed.rates) setRates(parsed.rates);
                 if (parsed.investments) setInvestments(parsed.investments);
                 if (parsed.withdrawalPercentage) setWithdrawalPercentage(parsed.withdrawalPercentage);
                 if (parsed.housePrice) setHousePrice(parsed.housePrice);
@@ -148,6 +149,7 @@ const UnitTrustCalculator = () => {
     // 2. Auto-save to Local Storage on every change
     useEffect(() => {
         const dataToSave = {
+            rates,
             investments,
             housePrice,
             downPayment,
@@ -162,7 +164,7 @@ const UnitTrustCalculator = () => {
             withdrawalPercentage
         };
         localStorage.setItem('unit_trust_data_v2', JSON.stringify(dataToSave));
-    }, [investments, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate, withdrawalPercentage]);
+    }, [rates, investments, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate, withdrawalPercentage]);
 
     // --- Calculation Logic ---
     const calculateReturns = (capital, annualRate, withdrawalPerc) => {
@@ -459,7 +461,21 @@ const UnitTrustCalculator = () => {
                                             prefix="Rs."
                                         />
                                         <div className="space-y-1">
-                                            <StatRow label="Annual Rate" value={`${(rates[f.fund] * 100).toFixed(2)}%`} highlight={f.fund.includes("Equity")} />
+                                            {f.fund === "Quantitative Equity" ? (
+                                                <div className="pb-2 mb-2 border-b border-[#1f243a]">
+                                                    <InputField 
+                                                        label="Annual Rate %" 
+                                                        type="number"
+                                                        value={Number((rates[f.fund] * 100).toFixed(4))} 
+                                                        onChange={(e) => {
+                                                            setRates(prev => ({ ...prev, [f.fund]: Number(e.target.value) / 100 }));
+                                                        }}
+                                                        suffix="%"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <StatRow label="Annual Rate" value={`${(rates[f.fund] * 100).toFixed(2)}%`} highlight={f.fund.includes("Equity")} />
+                                            )}
                                             <StatRow label="Monthly Est" value={`Rs. ${formatMoney(f.monthly)}`} />
                                             <StatRow label="Yearly Est" value={`Rs. ${formatMoney(f.yearly)}`} highlight />
                                         </div>
