@@ -91,7 +91,7 @@ export default function SummaryDashboard() {
         ndbWealth: true,
         fixedDeposit: true,
     });
-    const [withdrawalPercentage, setWithdrawalPercentage] = useState(0);
+    const [withdrawals, setWithdrawals] = useState({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
 
     useEffect(() => {
         const ut = localStorage.getItem('unit_trust_data_v3');
@@ -205,7 +205,8 @@ export default function SummaryDashboard() {
             const profit = currentPrincipal * averageYield;
             
             // Tax is only calculated on the portion that is withdrawn
-            const grossWithdrawn = profit * (withdrawalPercentage / 100);
+            const wPercent = withdrawals[year] || 0;
+            const grossWithdrawn = profit * (wPercent / 100);
             const tax = calculateTax(grossWithdrawn);
             
             // Net withdrawn amount (in pocket)
@@ -229,7 +230,7 @@ export default function SummaryDashboard() {
             currentPrincipal = endBalance; // Reinvesting the remaining net profit
         }
         return projection;
-    }, [grandTotalPrincipal, grandTotalYearly, withdrawalPercentage]);
+    }, [grandTotalPrincipal, grandTotalYearly, withdrawals]);
 
     return (
         <div className="min-h-screen bg-[#050816] text-white font-sans p-4 md:p-8">
@@ -456,61 +457,65 @@ export default function SummaryDashboard() {
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
                             <div className="flex items-center gap-4">
                                 <h2 className="text-xl font-black uppercase text-white tracking-widest">Multi-Year Simulation Console</h2>
-                                <span className="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-3 py-1 rounded-full border border-cyan-500/20">{100 - withdrawalPercentage}% REINVESTED</span>
-                            </div>
-                            
-                            <div className="bg-[#1a1f35] p-3 rounded-2xl border border-[#2a2e45] flex items-center gap-4 w-full md:w-auto">
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Net Profit Withdrawal</span>
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max="100" 
-                                    step="5"
-                                    value={withdrawalPercentage} 
-                                    onChange={(e) => setWithdrawalPercentage(Number(e.target.value))}
-                                    className="w-32 md:w-48 accent-amber-500"
-                                />
-                                <span className="text-sm font-black text-amber-400 w-12 text-right">{withdrawalPercentage}%</span>
+                                <span className="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-3 py-1 rounded-full border border-cyan-500/20">CUSTOM WITHDRAWALS</span>
                             </div>
                         </div>
                         
                         <div className="grid grid-cols-1 gap-6">
                             {fiveYearProjection.map((res) => (
                                 <GlowingCard key={res.year} className="bg-gradient-to-r from-[#0f1221] to-[#12162b]" special={res.year === 5} specialColor="cyan">
-                                    <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-8">
-                                        <div className="lg:w-1/4">
-                                            <span className="text-xs font-black text-cyan-500 uppercase tracking-widest">Projection Phase</span>
-                                            <h3 className="text-2xl font-black text-white">Year {res.year}</h3>
-                                        </div>
-                                        <div className="flex-1 grid grid-cols-2 md:grid-cols-6 gap-4">
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] text-gray-500 font-bold uppercase">Opening</span>
-                                                <div className="text-sm font-black text-white">Rs. {formatMoney(res.startBalance)}</div>
+                                    <div className="space-y-6">
+                                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-6 border-b border-[#2a2e45]/50">
+                                            <div>
+                                                <span className="text-xs font-black text-cyan-500 uppercase tracking-widest">Projection Phase</span>
+                                                <h3 className="text-3xl font-black text-white">Year {res.year}</h3>
                                             </div>
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] text-green-500 font-bold uppercase">Total Profit</span>
-                                                <div className="text-sm font-black text-green-400">+Rs. {formatMoney(res.profit)}</div>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] text-purple-500 font-bold uppercase">Taxable Withdraw</span>
-                                                <div className="text-sm font-black text-purple-400">Rs. {formatMoney(res.grossWithdrawn)}</div>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] text-red-500 font-bold uppercase">Tax</span>
-                                                <div className="text-sm font-black text-red-400">-Rs. {formatMoney(res.tax)}</div>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] text-amber-500 font-bold uppercase">Net Withdrawn</span>
-                                                <div className="text-sm font-black text-amber-400">-Rs. {formatMoney(res.withdrawnAmount)}</div>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] text-cyan-500 font-bold uppercase">Closing</span>
-                                                <div className="text-sm font-black text-cyan-400">Rs. {formatMoney(res.endBalance)}</div>
+                                            <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                                                <div className="bg-[#1a1f35] px-4 py-3 rounded-xl border border-[#2a2e45] flex items-center gap-4 w-full sm:w-auto">
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Withdrawal</span>
+                                                    <input 
+                                                        type="range" 
+                                                        min="0" 
+                                                        max="100" 
+                                                        step="5"
+                                                        value={withdrawals[res.year]} 
+                                                        onChange={(e) => setWithdrawals({...withdrawals, [res.year]: Number(e.target.value)})}
+                                                        className="w-full sm:w-32 md:w-48 accent-amber-500"
+                                                    />
+                                                    <span className="text-sm font-black text-amber-400 w-12 text-right">{withdrawals[res.year]}%</span>
+                                                </div>
+                                                <div className="bg-white/5 px-6 py-3 rounded-xl border border-white/10 text-center w-full sm:w-auto flex flex-row sm:flex-col justify-between sm:justify-center items-center">
+                                                    <span className="text-[10px] text-gray-300 font-black uppercase sm:mb-1">Reinvested</span>
+                                                    <div className="text-lg font-black text-white">+Rs. {formatMoney(res.reinvestedAmount)}</div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="lg:w-1/5 bg-white/5 p-4 rounded-3xl text-center border border-white/10">
-                                            <span className="text-[10px] text-gray-300 font-black uppercase">Reinvested</span>
-                                            <div className="text-xl font-black text-white">+Rs. {formatMoney(res.reinvestedAmount)}</div>
+
+                                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 pt-2">
+                                            <div className="space-y-2">
+                                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest whitespace-nowrap">Opening</span>
+                                                <div className="text-base font-black text-white whitespace-nowrap">Rs. {formatMoney(res.startBalance)}</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <span className="text-[10px] text-green-500 font-bold uppercase tracking-widest whitespace-nowrap">Total Profit</span>
+                                                <div className="text-base font-black text-green-400 whitespace-nowrap">+Rs. {formatMoney(res.profit)}</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <span className="text-[10px] text-purple-500 font-bold uppercase tracking-widest whitespace-nowrap">Gross Withdraw</span>
+                                                <div className="text-base font-black text-purple-400 whitespace-nowrap">Rs. {formatMoney(res.grossWithdrawn)}</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <span className="text-[10px] text-red-500 font-bold uppercase tracking-widest whitespace-nowrap">Tax</span>
+                                                <div className="text-base font-black text-red-400 whitespace-nowrap">-Rs. {formatMoney(res.tax)}</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <span className="text-[10px] text-amber-500 font-bold uppercase tracking-widest whitespace-nowrap">Net Withdraw</span>
+                                                <div className="text-base font-black text-amber-400 whitespace-nowrap">Rs. {formatMoney(res.withdrawnAmount)}</div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <span className="text-[10px] text-cyan-500 font-bold uppercase tracking-widest whitespace-nowrap">Closing</span>
+                                                <div className="text-base font-black text-cyan-400 whitespace-nowrap">Rs. {formatMoney(res.endBalance)}</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </GlowingCard>
