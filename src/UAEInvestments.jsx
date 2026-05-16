@@ -177,7 +177,7 @@ export default function UAEInvestments() {
                         </div>
 
                         {/* Combined UAE Summary */}
-                        <div className="mt-8 bg-emerald-900/10 border border-emerald-500/20 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div className="mt-8 bg-emerald-900/10 border border-emerald-500/20 p-6 rounded-2xl flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                             <div className="flex items-center gap-4">
                                 <div className="bg-emerald-500/20 p-3 rounded-xl">
                                     <TrendingUp className="w-6 h-6 text-emerald-400" />
@@ -187,14 +187,18 @@ export default function UAEInvestments() {
                                     <div className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Combined Fixed Deposit & Neo Account</div>
                                 </div>
                             </div>
-                            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                                <div className="bg-[#0f1221] p-4 rounded-xl border border-[#2a2e45] flex-1 text-center sm:text-right">
-                                    <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase block mb-1">Total Principal</span>
-                                    <div className="text-xl font-black text-white">{formatMoney(combinedPrincipal)} AED</div>
+                            <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
+                                <div className="bg-[#0f1221] p-4 rounded-xl border border-[#2a2e45] flex-1 text-center sm:text-right px-6">
+                                    <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase block mb-1 whitespace-nowrap">Total Principal</span>
+                                    <div className="text-xl font-black text-white whitespace-nowrap">{formatMoney(combinedPrincipal)} AED</div>
                                 </div>
-                                <div className="bg-[#0f1221] p-4 rounded-xl border border-emerald-500/30 flex-1 text-center sm:text-right">
-                                    <span className="text-[10px] text-emerald-500 font-black tracking-widest uppercase block mb-1">Total Monthly</span>
-                                    <div className="text-xl font-black text-emerald-400">+{formatMoney(combinedAnnual / 12)} AED</div>
+                                <div className="bg-[#0f1221] p-4 rounded-xl border border-emerald-500/20 flex-1 text-center sm:text-right px-6">
+                                    <span className="text-[10px] text-emerald-600 font-black tracking-widest uppercase block mb-1 whitespace-nowrap">Total Annual</span>
+                                    <div className="text-xl font-black text-emerald-500 whitespace-nowrap">+{formatMoney(combinedAnnual)} AED</div>
+                                </div>
+                                <div className="bg-[#0f1221] p-4 rounded-xl border border-emerald-500/40 flex-1 text-center sm:text-right px-6">
+                                    <span className="text-[10px] text-emerald-400 font-black tracking-widest uppercase block mb-1 whitespace-nowrap">Total Monthly</span>
+                                    <div className="text-xl font-black text-emerald-400 whitespace-nowrap">+{formatMoney(combinedAnnual / 12)} AED</div>
                                 </div>
                             </div>
                         </div>
