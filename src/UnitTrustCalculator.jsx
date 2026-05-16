@@ -89,10 +89,10 @@ const UnitTrustCalculator = () => {
     };
 
     const initialInvestments = {
-        "Investment Grade Fund": "30,000,000",
-        "Fixed Income Opportunities": "30,000,000",
-        "Quantitative Equity": "30,000,000",
-        "Money Market Fund": "30,000,000",
+        "Investment Grade Fund": "178,000,000",
+        "Fixed Income Opportunities": "178,000,000",
+        "Quantitative Equity": "200,000,000",
+        "Money Market Fund": "178,000,000",
     };
 
     const [rates, setRates] = useState(initialRates);
@@ -110,7 +110,7 @@ const UnitTrustCalculator = () => {
     const [vehicleLoanInterestRate, setVehicleLoanInterestRate] = useState('14.5');
     const [vehicleLoanTerm, setVehicleLoanTerm] = useState('5');
 
-    const [fixedDepositAmount, setFixedDepositAmount] = useState('150,000,000');
+    const [fixedDepositAmount, setFixedDepositAmount] = useState('267,000,000');
     const [fixedDepositRate, setFixedDepositRate] = useState('12.5');
 
     // Projection State
@@ -130,7 +130,7 @@ const UnitTrustCalculator = () => {
     // 1. Initial Load (Local Storage -> then Cloud)
     useEffect(() => {
         // First, check local storage for instant results
-        const localData = localStorage.getItem('unit_trust_data_v2');
+        const localData = localStorage.getItem('unit_trust_data_v3');
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
@@ -171,7 +171,7 @@ const UnitTrustCalculator = () => {
             fixedDepositRate,
             withdrawalPercentage
         };
-        localStorage.setItem('unit_trust_data_v2', JSON.stringify(dataToSave));
+        localStorage.setItem('unit_trust_data_v3', JSON.stringify(dataToSave));
     }, [rates, investments, housePrice, downPayment, loanInterestRate, loanTerm, vehiclePrice, vehicleDownPayment, vehicleLoanInterestRate, vehicleLoanTerm, fixedDepositAmount, fixedDepositRate, withdrawalPercentage]);
 
     // --- Calculation Logic ---
@@ -186,12 +186,12 @@ const UnitTrustCalculator = () => {
 
     const calculateTax = (income) => {
         const brackets = [
-            { upTo: 1_200_000, rate: 0.0 },
-            { upTo: 1_700_000, rate: 0.06 },
-            { upTo: 2_200_000, rate: 0.12 },
-            { upTo: 2_700_000, rate: 0.18 },
-            { upTo: 3_200_000, rate: 0.24 },
-            { upTo: 3_700_000, rate: 0.30 },
+            { upTo: 1_800_000, rate: 0.0 },
+            { upTo: 2_300_000, rate: 0.06 },
+            { upTo: 2_800_000, rate: 0.12 },
+            { upTo: 3_300_000, rate: 0.18 },
+            { upTo: 3_800_000, rate: 0.24 },
+            { upTo: 4_300_000, rate: 0.30 },
             { upTo: Infinity, rate: 0.36 },
         ];
         let tax = 0;
@@ -712,7 +712,7 @@ const UnitTrustCalculator = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                         <ul className="space-y-1">
                             <li>• All Unit Trust projections assume the selected annual rate remains constant for simulation.</li>
-                            <li>• Tax Slabs: 0% up to 1.2M, graduating up to 36% for amounts above 3.7M per annum.</li>
+                            <li>• Tax Slabs: 0% up to 1.8M, graduating up to 36% for amounts above 4.3M per annum.</li>
                         </ul>
                         <ul className="space-y-1">
                             <li>• Loan payments are based on standard Amortization formulas (EMI).</li>

@@ -80,16 +80,14 @@ const NDBWealthCalculator = () => {
         "NDB Wealth Income Plus Fund": 0.1400,
         "NDB Wealth Growth Fund": 0.4450,
         "NDB Wealth Growth & Income Fund": 0.4220,
-        "NDB Wealth Dollar Account": 0.05,
     };
 
     const initialInvestments = {
-        "NDB Wealth Money Fund": "30,000,000",
-        "NDB Wealth Income Fund": "30,000,000",
-        "NDB Wealth Income Plus Fund": "30,000,000",
-        "NDB Wealth Growth Fund": "15,000,000",
-        "NDB Wealth Growth & Income Fund": "15,000,000",
-        "NDB Wealth Dollar Account": "300,000",
+        "NDB Wealth Money Fund": "178,000,000",
+        "NDB Wealth Income Fund": "0",
+        "NDB Wealth Income Plus Fund": "178,000,000",
+        "NDB Wealth Growth Fund": "200,000,000",
+        "NDB Wealth Growth & Income Fund": "223,000,000",
     };
 
     const [rates, setRates] = useState(initialRates);
@@ -108,7 +106,7 @@ const NDBWealthCalculator = () => {
 
     // --- Persistence Logic ---
     useEffect(() => {
-        const localData = localStorage.getItem('ndb_wealth_data_v4');
+        const localData = localStorage.getItem('ndb_wealth_data_v6');
         if (localData) {
             try {
                 const parsed = JSON.parse(localData);
@@ -120,18 +118,18 @@ const NDBWealthCalculator = () => {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('ndb_wealth_data_v4', JSON.stringify({ investments, rates }));
+        localStorage.setItem('ndb_wealth_data_v6', JSON.stringify({ investments, rates }));
     }, [investments, rates]);
 
     // --- Calculation Logic ---
     const calculateTax = (income) => {
         const brackets = [
-            { upTo: 1_200_000, rate: 0.0 },
-            { upTo: 1_700_000, rate: 0.06 },
-            { upTo: 2_200_000, rate: 0.12 },
-            { upTo: 2_700_000, rate: 0.18 },
-            { upTo: 3_200_000, rate: 0.24 },
-            { upTo: 3_700_000, rate: 0.30 },
+            { upTo: 1_800_000, rate: 0.0 },
+            { upTo: 2_300_000, rate: 0.06 },
+            { upTo: 2_800_000, rate: 0.12 },
+            { upTo: 3_300_000, rate: 0.18 },
+            { upTo: 3_800_000, rate: 0.24 },
+            { upTo: 4_300_000, rate: 0.30 },
             { upTo: Infinity, rate: 0.36 },
         ];
         let tax = 0;
@@ -237,7 +235,6 @@ const NDBWealthCalculator = () => {
             "NDB Wealth Income Plus Fund": 0.1400,
             "NDB Wealth Growth Fund": 0.4450,
             "NDB Wealth Growth & Income Fund": 0.4220,
-            "NDB Wealth Dollar Account": 0.05,
         });
         setUpdateMessage("Rates updated based on Dec 2025 Benchmarks.");
         setTimeout(() => setUpdateMessage(""), 3000);
@@ -388,25 +385,7 @@ const NDBWealthCalculator = () => {
                                             <StatRow label="Yearly" value={`${f.currency} ${formatMoney(f.yearly)}`} highlight />
                                         </div>
 
-                                        {f.fund.includes("Dollar") && (
-                                            <div className="mt-4 pt-4 border-t border-[#2a2e45] space-y-3">
-                                                <div className="text-[9px] font-black text-amber-500 uppercase tracking-widest text-center">Dollar Account Sensitivity</div>
-                                                <div className="grid grid-cols-3 gap-2">
-                                                    <div className="bg-[#1a1f35] p-2 rounded-xl border border-[#2a2e45] text-center">
-                                                        <div className="text-[8px] text-gray-500 font-bold">4%</div>
-                                                        <div className="text-[10px] font-black text-white">${formatMoney((parseNumber(investments[f.fund]) * 0.04) / 12)}</div>
-                                                    </div>
-                                                    <div className="bg-amber-500/10 p-2 rounded-xl border border-amber-500/30 text-center">
-                                                        <div className="text-[8px] text-amber-500 font-bold">5%</div>
-                                                        <div className="text-[10px] font-black text-amber-400">${formatMoney((parseNumber(investments[f.fund]) * 0.05) / 12)}</div>
-                                                    </div>
-                                                    <div className="bg-[#1a1f35] p-2 rounded-xl border border-[#2a2e45] text-center">
-                                                        <div className="text-[8px] text-gray-500 font-bold">6%</div>
-                                                        <div className="text-[10px] font-black text-white">${formatMoney((parseNumber(investments[f.fund]) * 0.06) / 12)}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
+
                                     </div>
                                 </GlowingCard>
                             ))}

@@ -2,6 +2,7 @@ import React, { useState } from 'react' // Re-bundle trigger
 import FluidoFDRates from './FDRateCalculator'
 import UnitTrustCalculator from './UnitTrustCalculator'
 import NDBWealthCalculator from './NDBWealthCalculator.jsx'
+import SummaryDashboard from './SummaryDashboard.jsx'
 
 function App() {
   const [currentTab, setCurrentTab] = useState('unittrust') // 'unittrust', 'ndbwealth', or 'yield'
@@ -34,6 +35,12 @@ function App() {
             >
               Yield Calculator
             </button>
+            <button
+              onClick={() => setCurrentTab('summary')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'summary' ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              All Summaries
+            </button>
           </div>
         </div>
       </nav>
@@ -43,6 +50,7 @@ function App() {
         {currentTab === 'unittrust' && <UnitTrustCalculator />}
         {currentTab === 'ndbwealth' && <NDBWealthCalculator />}
         {currentTab === 'yield' && <FluidoFDRates />}
+        {currentTab === 'summary' && <SummaryDashboard />}
       </main>
     </div>
   )
