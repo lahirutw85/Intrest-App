@@ -77,14 +77,6 @@ export default function SummaryDashboard() {
     const [utData, setUtData] = useState(null);
     const [ndbData, setNdbData] = useState(null);
 
-    const [uaeData, setUaeData] = useState({
-        amount: 2000000,
-        rate: 5.5
-    });
-    const [mashreqData, setMashreqData] = useState({
-        amount: 5000000,
-        rate: 6.25
-    });
 
     const [selectedTotals, setSelectedTotals] = useState({
         unitTrust: true,
@@ -367,112 +359,6 @@ export default function SummaryDashboard() {
                     </div>
                 )}
 
-                {/* UAE Investments Section */}
-                <div className="mt-8">
-                    <GlowingCard special specialColor="emerald">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold uppercase tracking-widest text-xs mb-6">
-                            <TrendingUp className="w-4 h-4" /> UAE Bank Accounts & Fixed Deposits
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            
-                            {/* UAE Bank Fixed Deposit */}
-                            <div className="bg-[#1a1f35] p-6 rounded-2xl border border-[#2a2e45] space-y-4">
-                                <h3 className="font-bold text-white text-lg">UAE Bank Fixed Deposit</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Amount (AED)</label>
-                                        <input 
-                                            type="number" 
-                                            value={uaeData.amount} 
-                                            onChange={(e) => setUaeData({...uaeData, amount: Number(e.target.value)})}
-                                            className="w-full bg-[#0f1221] border border-[#2a2e45] text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500/50"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Rate (%)</label>
-                                        <input 
-                                            type="number" 
-                                            step="0.01"
-                                            value={uaeData.rate} 
-                                            onChange={(e) => setUaeData({...uaeData, rate: Number(e.target.value)})}
-                                            className="w-full bg-[#0f1221] border border-[#2a2e45] text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500/50"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="pt-4 border-t border-[#2a2e45] grid grid-cols-2 gap-4">
-                                    <div>
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-1 block">Annual Interest</span>
-                                        <div className="text-lg font-black text-emerald-400">{formatMoney(uaeData.amount * (uaeData.rate / 100))} AED</div>
-                                    </div>
-                                    <div>
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-1 block">Monthly Interest</span>
-                                        <div className="text-lg font-black text-emerald-400">{formatMoney((uaeData.amount * (uaeData.rate / 100)) / 12)} AED</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Mashreq Neo Account */}
-                            <div className="bg-[#1a1f35] p-6 rounded-2xl border border-[#2a2e45] space-y-4">
-                                <h3 className="font-bold text-white text-lg">Mashreq Neo Account</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Amount (AED)</label>
-                                        <input 
-                                            type="number" 
-                                            value={mashreqData.amount} 
-                                            onChange={(e) => setMashreqData({...mashreqData, amount: Number(e.target.value)})}
-                                            className="w-full bg-[#0f1221] border border-[#2a2e45] text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500/50"
-                                        />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Rate (%)</label>
-                                        <input 
-                                            type="number" 
-                                            step="0.01"
-                                            value={mashreqData.rate} 
-                                            onChange={(e) => setMashreqData({...mashreqData, rate: Number(e.target.value)})}
-                                            className="w-full bg-[#0f1221] border border-[#2a2e45] text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-emerald-500/50"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="pt-4 border-t border-[#2a2e45] grid grid-cols-2 gap-4">
-                                    <div>
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-1 block">Annual Interest</span>
-                                        <div className="text-lg font-black text-emerald-400">{formatMoney(mashreqData.amount * (mashreqData.rate / 100))} AED</div>
-                                    </div>
-                                    <div>
-                                        <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase mb-1 block">Monthly Interest</span>
-                                        <div className="text-lg font-black text-emerald-400">{formatMoney((mashreqData.amount * (mashreqData.rate / 100)) / 12)} AED</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Combined UAE Summary */}
-                        <div className="mt-8 bg-emerald-900/10 border border-emerald-500/20 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6">
-                            <div className="flex items-center gap-4">
-                                <div className="bg-emerald-500/20 p-3 rounded-xl">
-                                    <TrendingUp className="w-6 h-6 text-emerald-400" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-black text-white uppercase tracking-widest">Total UAE Portfolio</h3>
-                                    <div className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Combined Fixed Deposit & Neo Account</div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                                <div className="bg-[#0f1221] p-4 rounded-xl border border-[#2a2e45] flex-1 text-center sm:text-right">
-                                    <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase block mb-1">Total Principal</span>
-                                    <div className="text-xl font-black text-white">{formatMoney(uaeData.amount + mashreqData.amount)} AED</div>
-                                </div>
-                                <div className="bg-[#0f1221] p-4 rounded-xl border border-emerald-500/30 flex-1 text-center sm:text-right">
-                                    <span className="text-[10px] text-emerald-500 font-black tracking-widest uppercase block mb-1">Total Monthly</span>
-                                    <div className="text-xl font-black text-emerald-400">+{formatMoney(((uaeData.amount * (uaeData.rate / 100)) + (mashreqData.amount * (mashreqData.rate / 100))) / 12)} AED</div>
-                                </div>
-                            </div>
-                        </div>
-                    </GlowingCard>
-                </div>
 
                 {/* 5-Year Projection Section */}
                 {fiveYearProjection.length > 0 && (

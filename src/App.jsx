@@ -3,6 +3,7 @@ import FluidoFDRates from './FDRateCalculator'
 import UnitTrustCalculator from './UnitTrustCalculator'
 import NDBWealthCalculator from './NDBWealthCalculator.jsx'
 import SummaryDashboard from './SummaryDashboard.jsx'
+import UAEInvestments from './UAEInvestments.jsx'
 
 function App() {
   const [currentTab, setCurrentTab] = useState('unittrust') // 'unittrust', 'ndbwealth', or 'yield'
@@ -41,6 +42,12 @@ function App() {
             >
               All Summaries
             </button>
+            <button
+              onClick={() => setCurrentTab('uae')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${currentTab === 'uae' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              UAE Accounts
+            </button>
           </div>
         </div>
       </nav>
@@ -51,6 +58,7 @@ function App() {
         {currentTab === 'ndbwealth' && <NDBWealthCalculator />}
         {currentTab === 'yield' && <FluidoFDRates />}
         {currentTab === 'summary' && <SummaryDashboard />}
+        {currentTab === 'uae' && <UAEInvestments />}
       </main>
     </div>
   )
