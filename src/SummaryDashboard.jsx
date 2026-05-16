@@ -446,7 +446,31 @@ export default function SummaryDashboard() {
                                     </div>
                                 </div>
                             </div>
+                            </div>
 
+                        </div>
+
+                        {/* Combined UAE Summary */}
+                        <div className="mt-8 bg-emerald-900/10 border border-emerald-500/20 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-emerald-500/20 p-3 rounded-xl">
+                                    <TrendingUp className="w-6 h-6 text-emerald-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black text-white uppercase tracking-widest">Total UAE Portfolio</h3>
+                                    <div className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Combined Fixed Deposit & Neo Account</div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                                <div className="bg-[#0f1221] p-4 rounded-xl border border-[#2a2e45] flex-1 text-center sm:text-right">
+                                    <span className="text-[10px] text-gray-500 font-black tracking-widest uppercase block mb-1">Total Principal</span>
+                                    <div className="text-xl font-black text-white">{formatMoney(uaeData.amount + mashreqData.amount)} AED</div>
+                                </div>
+                                <div className="bg-[#0f1221] p-4 rounded-xl border border-emerald-500/30 flex-1 text-center sm:text-right">
+                                    <span className="text-[10px] text-emerald-500 font-black tracking-widest uppercase block mb-1">Total Monthly</span>
+                                    <div className="text-xl font-black text-emerald-400">+{formatMoney(((uaeData.amount * (uaeData.rate / 100)) + (mashreqData.amount * (mashreqData.rate / 100))) / 12)} AED</div>
+                                </div>
+                            </div>
                         </div>
                     </GlowingCard>
                 </div>
