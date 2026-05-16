@@ -220,6 +220,7 @@ export default function SummaryDashboard() {
                 year,
                 startBalance: currentPrincipal,
                 profit,
+                grossWithdrawn,
                 tax,
                 withdrawnAmount,
                 reinvestedAmount,
@@ -481,21 +482,25 @@ export default function SummaryDashboard() {
                                             <span className="text-xs font-black text-cyan-500 uppercase tracking-widest">Projection Phase</span>
                                             <h3 className="text-2xl font-black text-white">Year {res.year}</h3>
                                         </div>
-                                        <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                                        <div className="flex-1 grid grid-cols-2 md:grid-cols-6 gap-4">
                                             <div className="space-y-1">
                                                 <span className="text-[10px] text-gray-500 font-bold uppercase">Opening</span>
                                                 <div className="text-sm font-black text-white">Rs. {formatMoney(res.startBalance)}</div>
                                             </div>
                                             <div className="space-y-1">
-                                                <span className="text-[10px] text-green-500 font-bold uppercase">Profit</span>
+                                                <span className="text-[10px] text-green-500 font-bold uppercase">Total Profit</span>
                                                 <div className="text-sm font-black text-green-400">+Rs. {formatMoney(res.profit)}</div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] text-purple-500 font-bold uppercase">Taxable Withdraw</span>
+                                                <div className="text-sm font-black text-purple-400">Rs. {formatMoney(res.grossWithdrawn)}</div>
                                             </div>
                                             <div className="space-y-1">
                                                 <span className="text-[10px] text-red-500 font-bold uppercase">Tax</span>
                                                 <div className="text-sm font-black text-red-400">-Rs. {formatMoney(res.tax)}</div>
                                             </div>
                                             <div className="space-y-1">
-                                                <span className="text-[10px] text-amber-500 font-bold uppercase">Withdrawn</span>
+                                                <span className="text-[10px] text-amber-500 font-bold uppercase">Net Withdrawn</span>
                                                 <div className="text-sm font-black text-amber-400">-Rs. {formatMoney(res.withdrawnAmount)}</div>
                                             </div>
                                             <div className="space-y-1">
