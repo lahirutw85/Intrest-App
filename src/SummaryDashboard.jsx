@@ -446,7 +446,6 @@ export default function SummaryDashboard() {
                                     </div>
                                 </div>
                             </div>
-                            </div>
 
                         </div>
 
