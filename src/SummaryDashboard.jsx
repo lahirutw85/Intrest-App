@@ -340,7 +340,7 @@ export default function SummaryDashboard() {
                                 <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-xs mb-6">
                                     <Coins className="w-4 h-4" /> Fixed Deposit & Yield Summary
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-center">
                                         <span className="text-[10px] text-blue-400 font-black uppercase">Monthly Income</span>
                                         <div className="text-xl font-black text-white">Rs. {formatMoney(utResults.monthlyFd)}</div>
@@ -349,24 +349,28 @@ export default function SummaryDashboard() {
                                         <span className="text-[10px] text-red-400 font-black uppercase">Monthly Tax</span>
                                         <div className="text-xl font-black text-white text-red-400">Rs. {formatMoney(utResults.monthlyFdTax)}</div>
                                     </div>
-                                    <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl text-center">
-                                        <span className="text-[10px] text-purple-400 font-black uppercase">Church Tithe ({tithePercent}%)</span>
-                                        <div className="text-xl font-black text-white text-purple-400">Rs. {formatMoney(utResults.monthlyTithe)}</div>
-                                        <div className="mt-2 flex items-center justify-center gap-2">
-                                            <input 
-                                                type="range" 
-                                                min="0" 
-                                                max="50" 
-                                                step="1"
-                                                value={tithePercent} 
-                                                onChange={(e) => setTithePercent(Number(e.target.value))}
-                                                className="w-full accent-purple-500 h-1 bg-gray-700 rounded-lg appearance-none"
-                                            />
-                                        </div>
-                                    </div>
                                     <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-center">
                                         <span className="text-[10px] text-green-400 font-black uppercase">Net Surplus</span>
                                         <div className="text-xl font-black text-white">Rs. {formatMoney(utResults.monthlyFd - utResults.monthlyFdTax - utResults.monthlyLoan - utResults.monthlyVehicle - utResults.monthlyTithe)}</div>
+                                    </div>
+                                </div>
+                                <div className="mt-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div className="flex flex-col text-center md:text-left">
+                                        <span className="text-[10px] text-purple-400 font-black uppercase">Church Tithe ({tithePercent}%)</span>
+                                        <div className="text-xl font-black text-white text-purple-400">Rs. {formatMoney(utResults.monthlyTithe)}</div>
+                                    </div>
+                                    <div className="w-full md:w-1/2 flex items-center gap-4">
+                                        <span className="text-xs font-bold text-gray-500">0%</span>
+                                        <input 
+                                            type="range" 
+                                            min="0" 
+                                            max="50" 
+                                            step="1"
+                                            value={tithePercent} 
+                                            onChange={(e) => setTithePercent(Number(e.target.value))}
+                                            className="w-full accent-purple-500 h-1 bg-gray-700 rounded-lg appearance-none"
+                                        />
+                                        <span className="text-xs font-bold text-gray-500">50%</span>
                                     </div>
                                 </div>
                                 <div className="mt-4 flex items-start gap-3 p-3 rounded-xl bg-[#1a1f35] border border-[#2a2e45] text-gray-400 text-[10px] font-bold">
