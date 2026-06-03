@@ -187,8 +187,7 @@ const UnitTrustCalculator = () => {
     const calculateTax = (income) => {
         const brackets = [
             { upTo: 1_800_000, rate: 0.0 },
-            { upTo: 2_300_000, rate: 0.06 },
-            { upTo: 2_800_000, rate: 0.12 },
+            { upTo: 2_800_000, rate: 0.06 },
             { upTo: 3_300_000, rate: 0.18 },
             { upTo: 3_800_000, rate: 0.24 },
             { upTo: 4_300_000, rate: 0.30 },

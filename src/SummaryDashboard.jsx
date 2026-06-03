@@ -55,8 +55,7 @@ const parseNumber = (s) => {
 const calculateTax = (income) => {
     const brackets = [
         { upTo: 1_800_000, rate: 0.0 },
-        { upTo: 2_300_000, rate: 0.06 },
-        { upTo: 2_800_000, rate: 0.12 },
+        { upTo: 2_800_000, rate: 0.06 },
         { upTo: 3_300_000, rate: 0.18 },
         { upTo: 3_800_000, rate: 0.24 },
         { upTo: 4_300_000, rate: 0.30 },
@@ -84,6 +83,7 @@ export default function SummaryDashboard() {
         fixedDeposit: true,
     });
     const [withdrawals, setWithdrawals] = useState({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
+    const [tithePercent, setTithePercent] = useState(10);
 
     useEffect(() => {
         const ut = localStorage.getItem('unit_trust_data_v3');
@@ -91,7 +91,14 @@ export default function SummaryDashboard() {
         
         const ndb = localStorage.getItem('ndb_wealth_data_v6');
         if (ndb) setNdbData(JSON.parse(ndb));
+        
+        const savedTithe = localStorage.getItem('tithe_percent_v1');
+        if (savedTithe) setTithePercent(JSON.parse(savedTithe));
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem('tithe_percent_v1', JSON.stringify(tithePercent));
+    }, [tithePercent]);
 
     // Helper calculation for UT
     const utResults = useMemo(() => {
@@ -129,12 +136,15 @@ export default function SummaryDashboard() {
         const monthlyLoan = calculateLoanPayment(parseNumber(housePrice), parseNumber(downPayment), parseFloat(loanInterestRate) || 0, parseInt(loanTerm) || 0);
         const monthlyVehicle = calculateLoanPayment(parseNumber(vehiclePrice), parseNumber(vehicleDownPayment), parseFloat(vehicleLoanInterestRate) || 0, parseInt(vehicleLoanTerm) || 0);
 
+        const monthlyFdNet = monthlyFd - monthlyFdTax;
+        const monthlyTithe = monthlyFdNet * (tithePercent / 100);
+
         return {
             totalInvestment, totalMonthlyEst, totalYearlyEst,
             fdPrincipal, monthlyFd, monthlyFdTax,
-            monthlyLoan, monthlyVehicle
+            monthlyLoan, monthlyVehicle, monthlyTithe
         };
-    }, [utData]);
+    }, [utData, tithePercent]);
 
     // Helper calculation for NDB
     const ndbResults = useMemo(() => {
@@ -330,7 +340,7 @@ export default function SummaryDashboard() {
                                 <div className="flex items-center gap-2 text-blue-400 font-bold uppercase tracking-widest text-xs mb-6">
                                     <Coins className="w-4 h-4" /> Fixed Deposit & Yield Summary
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                                     <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-center">
                                         <span className="text-[10px] text-blue-400 font-black uppercase">Monthly Income</span>
                                         <div className="text-xl font-black text-white">Rs. {formatMoney(utResults.monthlyFd)}</div>
@@ -339,14 +349,29 @@ export default function SummaryDashboard() {
                                         <span className="text-[10px] text-red-400 font-black uppercase">Monthly Tax</span>
                                         <div className="text-xl font-black text-white text-red-400">Rs. {formatMoney(utResults.monthlyFdTax)}</div>
                                     </div>
+                                    <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-2xl text-center">
+                                        <span className="text-[10px] text-purple-400 font-black uppercase">Church Tithe ({tithePercent}%)</span>
+                                        <div className="text-xl font-black text-white text-purple-400">Rs. {formatMoney(utResults.monthlyTithe)}</div>
+                                        <div className="mt-2 flex items-center justify-center gap-2">
+                                            <input 
+                                                type="range" 
+                                                min="0" 
+                                                max="50" 
+                                                step="1"
+                                                value={tithePercent} 
+                                                onChange={(e) => setTithePercent(Number(e.target.value))}
+                                                className="w-full accent-purple-500 h-1 bg-gray-700 rounded-lg appearance-none"
+                                            />
+                                        </div>
+                                    </div>
                                     <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-center">
                                         <span className="text-[10px] text-green-400 font-black uppercase">Net Surplus</span>
-                                        <div className="text-xl font-black text-white">Rs. {formatMoney(utResults.monthlyFd - utResults.monthlyFdTax - utResults.monthlyLoan - utResults.monthlyVehicle)}</div>
+                                        <div className="text-xl font-black text-white">Rs. {formatMoney(utResults.monthlyFd - utResults.monthlyFdTax - utResults.monthlyLoan - utResults.monthlyVehicle - utResults.monthlyTithe)}</div>
                                     </div>
                                 </div>
                                 <div className="mt-4 flex items-start gap-3 p-3 rounded-xl bg-[#1a1f35] border border-[#2a2e45] text-gray-400 text-[10px] font-bold">
                                     <Info className="w-3 h-3 text-blue-400 shrink-0 mt-0.5" />
-                                    <span>Net Surplus takes into account monthly tax as well as Housing and Vehicle EMI deductions from the Fixed Deposit income.</span>
+                                    <span>Net Surplus takes into account monthly tax, Church Tithe, as well as Housing and Vehicle EMI deductions from the Fixed Deposit income. Tithe is calculated from the Net Profit (Income - Tax).</span>
                                 </div>
                             </GlowingCard>
                         )}
